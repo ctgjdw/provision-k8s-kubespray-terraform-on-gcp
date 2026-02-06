@@ -1,0 +1,6 @@
+project_id = "your-project-id"
+instance_name_prefix = "your-instance-name-prefix"
+machine_type = "e2-standard-2"
+zone = "asia-southeast1-a"
+disk_size = 50
+network = "your-network"
