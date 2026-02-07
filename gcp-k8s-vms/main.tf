@@ -34,10 +34,27 @@ resource "google_compute_instance" "control_plane" {
   network_interface {
     subnetwork = google_compute_subnetwork.vm_subnetwork.id
     access_config {
-      // Ephemeral public IP
+      nat_ip = google_compute_address.control_plane_ip[count.index].address
     }
   }
 }
+
+# Static external IPs for control plane instances
+resource "google_compute_address" "control_plane_ip" {
+  count        = var.control_plane_count
+  name         = "${var.instance_name_prefix}-cp-${count.index}-ip"
+  region       = var.region
+  address_type = "EXTERNAL"
+}
+
+# Static external IPs for worker nodes
+resource "google_compute_address" "worker_ip" {
+  count        = var.worker_count
+  name         = "${var.instance_name_prefix}-worker-${count.index}-ip"
+  region       = var.region
+  address_type = "EXTERNAL"
+}
+
 
 resource "google_compute_firewall" "allow_ssh" {
   name    = "allow-ssh"
@@ -87,7 +104,7 @@ resource "google_compute_instance" "worker_nodes" {
   network_interface {
     subnetwork = google_compute_subnetwork.vm_subnetwork.id
     access_config {
-      // Ephemeral public IP
+      nat_ip = google_compute_address.worker_ip[count.index].address
     }
   }
 }
