@@ -49,6 +49,16 @@ resource "google_compute_firewall" "allow_ssh" {
   source_ranges = ["0.0.0.0/0"]
 }
 
+resource "google_compute_firewall" "allow_kubectl" {
+  name    = "allow-kubectl"
+  network = google_compute_network.vm_network.name
+  allow {
+    protocol = "tcp"
+    ports    = ["6443"]
+  }
+  source_ranges = ["0.0.0.0/0"]
+}
+
 # Create a new firewall rule to allow internal traffic
 resource "google_compute_firewall" "allow_internal" {
   name    = "allow-internal"
