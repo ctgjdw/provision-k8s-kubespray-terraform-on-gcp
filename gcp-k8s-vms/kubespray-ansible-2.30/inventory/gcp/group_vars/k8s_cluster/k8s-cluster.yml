@@ -24,7 +24,7 @@ retry_stagger: 5
 
 # This is the user that owns the cluster installation.
 # Note: cilium needs to set kube_owner to root https://kubespray.io/#/docs/CNI/cilium?id=unprivileged-agent-configuration
-kube_owner: kube
+kube_owner: root
 
 # This is the group that the cert creation scripts chgrp the
 # cert files to. Not really changeable...
@@ -39,7 +39,6 @@ credentials_dir: "{{ inventory_dir }}/credentials"
 ## It is possible to activate / deactivate selected authentication methods (oidc, static token auth)
 # kube_oidc_auth: false
 # kube_token_auth: false
-
 
 ## Variables for OpenID Connect Configuration https://kubernetes.io/docs/admin/authentication/
 ## To use OpenID you have to deploy additional an OpenID Provider (e.g Dex, Keycloak, ...)
@@ -65,7 +64,7 @@ credentials_dir: "{{ inventory_dir }}/credentials"
 
 # Choose network plugin (cilium, calico, kube-ovn or flannel. Use cni for generic cni plugin)
 # Can also be set to 'cloud', which lets the cloud provider setup appropriate routing
-kube_network_plugin: calico
+kube_network_plugin: cilium
 
 # Setting multi_networking to true will install Multus: https://github.com/k8snetworkplumbingwg/multus-cni
 kube_network_plugin_multus: false
@@ -113,7 +112,7 @@ kube_network_node_prefix_ipv6: 120
 
 # The port the API Server will be listening on.
 kube_apiserver_ip: "{{ kube_service_subnets.split(',') | first | ansible.utils.ipaddr('net') | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }}"
-kube_apiserver_port: 6443  # (https)
+kube_apiserver_port: 6443 # (https)
 
 # Kube-proxy proxyMode configuration.
 # Can be ipvs, iptables, nftables
@@ -149,7 +148,7 @@ kube_encrypt_secret_data: false
 
 # DNS configuration.
 # Kubernetes cluster name, also will be used as DNS domain
-cluster_name: cluster.local
+cluster_name: gcp.test
 # Subdomains of DNS domain to be resolved via /etc/resolv.conf for hostnet pods
 ndots: 2
 # dns_timeout: 2
@@ -236,9 +235,9 @@ kubernetes_audit: false
 default_kubelet_config_dir: "{{ kube_config_dir }}/dynamic_kubelet_dir"
 
 # Make a copy of kubeconfig on the host that runs Ansible in {{ inventory_dir }}/artifacts
-# kubeconfig_localhost: false
+kubeconfig_localhost: true
 # Use ansible_host as external api ip when copying over kubeconfig.
-# kubeconfig_localhost_ansible_host: false
+kubeconfig_localhost_ansible_host: true
 # Download kubectl onto the host that runs Ansible in {{ bin_dir }}
 # kubectl_localhost: false
 
@@ -285,7 +284,15 @@ default_kubelet_config_dir: "{{ kube_config_dir }}/dynamic_kubelet_dir"
 
 ## Supplementary addresses that can be added in kubernetes ssl keys.
 ## That can be useful for example to setup a keepalived virtual IP
-# supplementary_addresses_in_ssl_keys: [10.0.0.1, 10.0.0.2, 10.0.0.3]
+supplementary_addresses_in_ssl_keys:
+  [
+    "34.158.57.47",
+    "35.197.142.92",
+    "34.142.200.12",
+    "35.240.238.112",
+    "34.124.223.70",
+    "34.87.0.26",
+  ]
 
 ## Running on top of openstack vms with cinder enabled may lead to unschedulable pods due to NoVolumeZoneConflict restriction in kube-scheduler.
 ## See https://github.com/kubernetes-sigs/kubespray/issues/2141
